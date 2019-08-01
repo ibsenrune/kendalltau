@@ -11,6 +11,8 @@ let rec unorderedPairs xs =
     }
   | [] -> Seq.empty  
 
+let numberOfPairs n = n * (n-1) / 2
+
 let (|Concordant|Discordant|Equal|) (i1 : Item, i2 : Item) =
   if i1.Value1 = i2.Value1 && i1.Value2 = i2.Value2 then Equal
   else if(i1.Value1 - i2.Value1) * (i1.Value2 - i2.Value2) < 0 then Discordant
@@ -26,9 +28,8 @@ let tauDistance (ls : Item list) =
 //Returns percentage (range 0 to 1) of item pairs that have changed order
 let normalisedTauDistance xs =
   let count = List.length xs
-  let numPairs = count * (count - 1) / 2
   let distance = tauDistance xs
-  (float distance) / (float numPairs)
+  (float distance) / (float (numberOfPairs count))
 
 let example : Item list = [
     { Title = "A"; Value1 = 1;  Value2 = 6  }
