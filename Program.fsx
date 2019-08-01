@@ -1,6 +1,7 @@
-﻿open System
+﻿#load "Csv.fs"
 
-type Item = { Title : string; Value1 : int; Value2 : int }
+open System
+open Csv
 
 let rec unorderedPairs xs =
   match xs with
@@ -10,17 +11,23 @@ let rec unorderedPairs xs =
     }
   | [] -> Seq.empty  
 
-let kendallTau (ls : Item list) =
-  let areDiscordant (i1 : Item, i2: Item) =
-    (i1.Value1 - i2.Value1) * (i1.Value2 - i2.Value2) < 0
+let (|Concordant|Discordant|Equal|) (i1 : Item, i2 : Item) =
+  if i1.Value1 = i2.Value1 && i1.Value2 = i2.Value2 then Equal
+  else if(i1.Value1 - i2.Value1) * (i1.Value2 - i2.Value2) < 0 then Discordant
+  else Concordant 
+
+let tauDistance (ls : Item list) =
+  let areDiscordant = function
+    | Discordant -> true
+    | _ -> false
   let pairsThatAreDiscordant = unorderedPairs ls |> Seq.filter areDiscordant
   pairsThatAreDiscordant |> Seq.length
 
 //Returns percentage (range 0 to 1) of item pairs that have changed order
-let normalisedKendallTau xs =
+let normalisedTauDistance xs =
   let count = List.length xs
   let numPairs = count * (count - 1) / 2
-  let distance = kendallTau xs
+  let distance = tauDistance xs
   (float distance) / (float numPairs)
 
 let example : Item list = [
@@ -35,3 +42,7 @@ let example : Item list = [
     { Title = "I"; Value1 = 9;  Value2 = 9  }
     { Title = "J"; Value1 = 10; Value2 = 10 }
 ]  
+
+let filepath = @"C:\Users\RuneIbsen\Downloads\rankings.csv"
+
+filepath |> readCsv |> normalisedTauDistance
