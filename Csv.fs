@@ -2,7 +2,9 @@ module Csv
 
 open System
 
-type Item = { Title : string; Value1 : int; Value2 : int }
+type Item = { Title : string; Rank1 : int; Rank2 : int }
+let rank1 x = x.Rank1
+let rank2 x = x.Rank2
 
 let readLines path = System.IO.File.ReadAllLines path |> List.ofArray
 let rec splitCsv (line : string) =
@@ -22,7 +24,7 @@ let (|Int|_|) str =
 
 let parseItem line =
   match splitCsv line with
-  | title::_::_::id::(Int rank1)::(Int rank2)::[] -> { Title = id; Value1 = rank1; Value2 = rank2 }
+  | title::_::_::id::(Int rank1)::(Int rank2)::[] -> { Title = id; Rank1 = rank1; Rank2 = rank2 }
   | _ -> failwith (sprintf "Cannot parse line:\n\t%s" line)
 
 let readCsv path =
